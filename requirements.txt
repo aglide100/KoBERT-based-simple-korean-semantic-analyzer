@@ -1,0 +1,4 @@
+gluonnlp
+numpy
+boto3 
+onnxruntime 
