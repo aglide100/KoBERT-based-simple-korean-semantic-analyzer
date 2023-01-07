@@ -4,6 +4,10 @@ from torch.utils.data import Dataset
 import gluonnlp as nlp
 import numpy as np
 from kobert_tokenizer import KoBERTTokenizer
+# from hanspell import spell_checker
+import re
+import logging
+from quickspacer import Spacer
 
 device_kind = ""
 
@@ -16,7 +20,6 @@ else:
     device = torch.device("cpu")
     device_kind="cpu"
     print('No GPU available, using the CPU instead.')
-
 
 tokenizer = KoBERTTokenizer.from_pretrained('skt/kobert-base-v1')
 vocab = nlp.vocab.BERTVocab.from_sentencepiece(tokenizer.vocab_file, padding_token='[PAD]')
@@ -70,6 +73,9 @@ class BERTDataset(Dataset):
         return (len(self.labels))
 
 def predict(sentence):
+    print("----------- \n전달받은 Sentence:")
+    
+    print(sentence)
     dataset = [[sentence, '0']]
     test = BERTDataset(dataset, 0, 1, tok, vocab, max_len, True, False)
     test_dataloader = torch.utils.data.DataLoader(test, batch_size=batch_size, num_workers=2)
@@ -84,10 +90,39 @@ def predict(sentence):
         for logits in out:
             logits = logits.detach().cpu().numpy()
             answer = np.argmax(logits)
+
+    print("Result : ", answer)
     return answer
 
 
 model = torch.load('model/SentimentAnalysisKOBert.pt', map_location=torch.device(device_kind))
+
+def remove_unnecessary_word(text):
+    text = re.sub('[/[\{\}\[\]\/?|\)*~`!\-_+<>@\#$%&\\\=\(\'\"]+', '', str(text))
+    text = re.sub('[a-zA-Z]' , ' ', str(text))
+    text = re.sub(' +', ' ', str(text))
+    text = re.sub(r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", ' ', str(text)) # http로 시작되는 url
+    text = re.sub(r"[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{2,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)", ' ', str(text)) # http로 시작되지 않는 url
+    
+    spacer = Spacer()
+    # text = text.rstrip().lstrip()
+    text.replace(" " , "")
+    text = spacer.space([text])
+    return text[0]
+
+class Analyzer:
+    def analyze_word(self, row):
+        try:
+            result = predict(remove_unnecessary_word(row))
+        except:
+            print("Get some err")
+            return
+
+        return result
+
+if __name__ == "__main__":
+    test = Analyzer()
+    print(test.analyze_word("누가나한테우유를던졌어아주신선한우유를말이야근데이거진짜로진짜제대로잘돌아가는거맞냐는게바로나의질문이란말이지아니근데이건좀너무한거아닙니까?맞춤법좀잘맞춰서띄어쓰기좀해여"))
 
 # '기쁨' = 0                    
 # '불안' = 1                   
@@ -95,7 +130,3 @@ model = torch.load('model/SentimentAnalysisKOBert.pt', map_location=torch.device
 # '슬픔' = 3                    
 # '분노' = 4                    
 # '상처' = 5  
-
-sentence = '뭐야 이건 이러는 건 아니잖아'
-result = predict(sentence)
-print(result)
