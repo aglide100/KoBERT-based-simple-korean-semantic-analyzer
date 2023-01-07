@@ -1,15 +1,57 @@
 import torch
+from torch import nn
+from torch.utils.data import Dataset
 import gluonnlp as nlp
 import numpy as np
-from tokenization_kobert import KoBERTTokenizer
+from kobert_tokenizer import KoBERTTokenizer
 
-model = torch.load('model/SentimentAnalysisKOBert.pt')
+device_kind = ""
+
+if torch.cuda.is_available():    
+    device = torch.device("cuda")
+    device_kind="cuda"
+    print('There are %d GPU(s) available.' % torch.cuda.device_count())
+    print('We will use the GPU:', torch.cuda.get_device_name(0))
+else:
+    device = torch.device("cpu")
+    device_kind="cpu"
+    print('No GPU available, using the CPU instead.')
+
+
 tokenizer = KoBERTTokenizer.from_pretrained('skt/kobert-base-v1')
 vocab = nlp.vocab.BERTVocab.from_sentencepiece(tokenizer.vocab_file, padding_token='[PAD]')
 batch_size = 64
 max_len = 64
 tok = tokenizer.tokenize
-device = torch.device("cpu")
+
+class BERTClassifier(nn.Module):
+    def __init__(self,
+                 bert,
+                 hidden_size = 768,
+                 num_classes=6,
+                 dr_rate=None,
+                 params=None):
+        super(BERTClassifier, self).__init__()
+        self.bert = bert
+        self.dr_rate = dr_rate
+                 
+        self.classifier = nn.Linear(hidden_size , num_classes)
+        if dr_rate:
+            self.dropout = nn.Dropout(p=dr_rate)
+    
+    def gen_attention_mask(self, token_ids, valid_length):
+        attention_mask = torch.zeros_like(token_ids)
+        for i, v in enumerate(valid_length):
+            attention_mask[i][:v] = 1
+        return attention_mask.float()
+
+    def forward(self, token_ids, valid_length, segment_ids):
+        attention_mask = self.gen_attention_mask(token_ids, valid_length)
+        
+        _, pooler = self.bert(input_ids = token_ids, token_type_ids = segment_ids.long(), attention_mask = attention_mask.float().to(token_ids.device))
+        if self.dr_rate:
+            out = self.dropout(pooler)
+        return self.classifier(out)
 
 class BERTDataset(Dataset):
     def __init__(self, dataset, sent_idx, label_idx, bert_tokenizer,vocab, max_len,
@@ -45,5 +87,15 @@ def predict(sentence):
     return answer
 
 
-sentence = '하하 집에 간다'
-predict(sentence)
+model = torch.load('model/SentimentAnalysisKOBert.pt', map_location=torch.device(device_kind))
+
+# '기쁨' = 0                    
+# '불안' = 1                   
+# '당황' = 2                    
+# '슬픔' = 3                    
+# '분노' = 4                    
+# '상처' = 5  
+
+sentence = '뭐야 이건 이러는 건 아니잖아'
+result = predict(sentence)
+print(result)

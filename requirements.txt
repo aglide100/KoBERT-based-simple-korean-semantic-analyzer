@@ -2,3 +2,7 @@ gluonnlp
 numpy
 boto3 
 onnxruntime 
+transformers
+torch
+sentencepiece
+scikit-learn
