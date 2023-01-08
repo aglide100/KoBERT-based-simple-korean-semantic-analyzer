@@ -17,10 +17,7 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
 RUN pip3 install -r requirements.txt
 
-
 RUN pip3 install 'git+https://github.com/SKTBrain/KoBERT.git#egg=kobert_tokenizer&subdirectory=kobert_hf'
-
-# RUN pip3 install git+https://github.com/ssut/py-hanspell.git 
 
 RUN pip install quickspacer tensorflow_io==0.29.0
 

@@ -21,7 +21,6 @@ RUN pip install quickspacer tensorflow_io==0.29.0
 
 RUN pip3 install 'git+https://github.com/SKTBrain/KoBERT.git#egg=kobert_tokenizer&subdirectory=kobert_hf'
 
-RUN pip install git+https://github.com/ssut/py-hanspell.git 
 
 RUN mkdir -p skt/kobert-base-v1 && cd skt/kobert-base-v1 && \ 
     wget https://huggingface.co/skt/kobert-base-v1/raw/main/tokenizer_config.json && \
