@@ -102,7 +102,7 @@ def predict(sentence):
     print("Result : ", max(logits))
     return [logits, domain[np.argmax(logits)], logits[np.argmax(logits)] ]
 
-model = torch.load('model/SentimentAnalysisKOBert.pt', map_location=torch.device(device_kind))
+model = torch.load('./SentimentAnalysisKOBert.pt', map_location=torch.device(device_kind))
 
 def remove_unnecessary_word(text):
     text = re.sub('[/[\{\}\[\]\/?|\)*~`!\-_+<>@\#$%&\\\=\(\'\"]+', '', str(text))
