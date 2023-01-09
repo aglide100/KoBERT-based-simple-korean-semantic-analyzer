@@ -29,4 +29,6 @@ RUN mkdir -p skt/kobert-base-v1 && cd skt/kobert-base-v1 && \
 
 COPY . .
 
+RUN touch Test.py && cat Analyzer.py >> Test.py && cat TestCode.py >> Test.py && rm -f TestCode.py
+
 ENTRYPOINT ["python3"]

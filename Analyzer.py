@@ -41,7 +41,7 @@ class BERTClassifier(nn.Module):
                  num_classes=6,
                  dr_rate=None,
                  params=None):
-        super(BERTClassifier, self).__init__()
+        super(self).__init__()
         self.bert = bert
         self.dr_rate = dr_rate
                  
@@ -117,24 +117,15 @@ def remove_unnecessary_word(text):
     text = spacer.space([text])
     return text[0]
 
-class Analyzer:
-    def analyze_word(self, row):
-        try:
-            result = predict(remove_unnecessary_word(row))
-        except:
-            print("Get some err")
-            return
 
-        return result
+def analyze_word(row):
+    try:
+        result = predict(remove_unnecessary_word(row))
+    except:
+        print("Get some err")
+        return
+    return result
 
-if __name__ == "__main__":
-    test = Analyzer()
-    # [array([ 5.8531494, -0.6694658, -1.1817917, -0.908142 , -1.2727499, -1.5652826], dtype=float32), 'Happy', 5.8531494]
-    print(test.analyze_word("아무런기대도 하지 않았지만 생각보다 괜찮은 결과였다"))
-    print(test.analyze_word("이게 맞아?? 이런 방식은 좀 아닌거 같아"))
-    print(test.analyze_word("으...의도는 좋은거 같지만 좀 망한거 같은디??"))
-    print(test.analyze_word("할 일이 너무 많네요😅 할 일은 항상 끝이 없….🫠"))
-    print(test.analyze_word("비둘기, 라이너 릴케 소학교 불러 다하지 봄이 슬퍼하는 봅니다. 한 이제 벌레는 북간도에 까닭입니다. 시와 하나에 차 이름을 나는 묻힌 딴은 봅니다. 이름과, 불러 우는 다하지 어머니, 북간도에 거외다. 별 추억과 멀듯이, 토끼, 아름다운 있습니다. 이름과 많은 헤는 어머님, 때 이런 피어나듯이 아침이 속의 듯합니다. 별 같이 강아지, 별을 별빛이 걱정도 별 당신은 있습니다. 무성할 어머님, 같이 밤을 프랑시스 피어나듯이 비둘기, 이름을 봅니다. 까닭이요, 소녀들의 불러 동경과 이웃 있습니다. 이름과 나의 별 나의 이름자 있습니다. 쉬이 못 하나에 마디씩 별에도 아직 내일 버리었습니다."))
 
 # Happy '기쁨' = 0                    
 # Fear '불안' = 1                   
