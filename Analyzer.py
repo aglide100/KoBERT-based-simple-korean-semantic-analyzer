@@ -80,7 +80,7 @@ class BERTDataset(Dataset):
         return (len(self.labels))
 
 def predict(sentence):
-    print("----------- \n전달받은 Sentence:")
+    print("----------- \n Sentence : ")
     
     print(sentence)
     dataset = [[sentence, '0']]
@@ -96,7 +96,7 @@ def predict(sentence):
         for logits in out:
             logits = logits.detach().cpu().numpy()
             # print(logits)
-            print("Max : ",np.argmax(logits))
+            print("Max : ", domain[np.argmax(logits)])
 
 
     print("Result : ", max(logits))
@@ -105,7 +105,7 @@ def predict(sentence):
 model = torch.load('./SentimentAnalysisKOBert.pt', map_location=torch.device(device_kind))
 
 def remove_unnecessary_word(text):
-    text = re.sub('[/[\{\}\[\]\/?|\)*~`!\-_+<>@\#$%&\\\=\(\'\"]+', '', str(text))
+    text = re.sub('[/[\{\}\[\]\/|\)*~`\-_+<>@\#$%&\\\=\(\'\"]+', '', str(text))
     text = re.sub('[a-zA-Z]' , ' ', str(text))
     text = re.sub(' +', ' ', str(text))
     text = re.sub(r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", ' ', str(text)) # http로 시작되는 url
