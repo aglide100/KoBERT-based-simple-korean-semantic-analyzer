@@ -36,6 +36,6 @@ jobs:
               with:
                   context: .
                   file: ${{ matrix.platformName }}.Dockerfile
-                  platforms: ${{ matrix.platformName }}
+                  platforms: linux/${{ matrix.platformName }}
                   push: true
                   tags: ghcr.io/aglide100/kobert-based-simple-korean-semantic-analyzer:latest
