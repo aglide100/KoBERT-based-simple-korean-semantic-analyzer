@@ -4,14 +4,7 @@ COPY requirements.txt .
 
 RUN apt-get update && apt-get install -y libssl-dev zlib1g-dev gcc g++ make git wget
 
-# SHELL ["/bin/bash", "--login", "-c"]
-
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-
-# RUN conda env create -f environment.yml
-# RUN conda init bash
-
-# RUN conda activate myenv
 
 RUN pip3 install mxnet
 

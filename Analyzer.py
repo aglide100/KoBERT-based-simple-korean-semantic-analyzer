@@ -111,7 +111,7 @@ def remove_unnecessary_word(text):
     text = re.sub(r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", ' ', str(text)) # http로 시작되는 url
     text = re.sub(r"[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{2,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)", ' ', str(text)) # http로 시작되지 않는 url
     
-    spacer = Spacer()
+    spacer = Spacer(level=3)
     # text = text.rstrip().lstrip()
     text.replace(" " , "")
     text = spacer.space([text])

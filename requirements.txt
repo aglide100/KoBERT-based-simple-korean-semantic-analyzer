@@ -7,3 +7,4 @@ torch
 sentencepiece
 scikit-learn
 pandas
+accelerate
