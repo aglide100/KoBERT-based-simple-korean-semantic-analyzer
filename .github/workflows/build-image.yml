@@ -34,10 +34,14 @@ jobs:
                   username: ${{ github.repository_owner }}
                   password: ${{ secrets.GHCRTOKEN }}
             - name: Build and push
+              env:
+                  IMAGE_TAG: ghcr.io/aglide100/kobert-based-simple-korean-semantic-analyzer:latest
+                  PLATFORMS: linux/${{ matrix.platformName }}
               uses: docker/build-push-action@v2
               with:
                   context: .
                   file: ${{ matrix.platformName }}.Dockerfile
                   platforms: linux/${{ matrix.platformName }}
                   push: true
-                  tags: ghcr.io/aglide100/kobert-based-simple-korean-semantic-analyzer:latest
+                  tags: |
+                      ghcr.io/aglide100/kobert-based-simple-korean-semantic-analyzer:latest-${{ matrix.platformName }}

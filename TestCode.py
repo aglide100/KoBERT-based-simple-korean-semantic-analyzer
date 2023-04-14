@@ -2,15 +2,10 @@
 import torch
 import numpy as np
 import random
-import tensorflow as tf
-from transformers import AutoTokenizer
-from transformers import TFGPT2LMHeadModel
-from quickspacer import Spacer
-
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-
-
-
+# import tensorflow as tf
+# from transformers import AutoTokenizer
+# from transformers import TFGPT2LMHeadModel
+# from quickspacer import Spacer
 
 import time
 # import pandas as pd
@@ -24,8 +19,6 @@ import time
 start = time.time()
 
 # rows = pd.read_csv('movie_review_long.csv')
-
-
 
 if __name__ == "__main__":
     # model = TFGPT2LMHeadModel.from_pretrained('skt/kogpt2-base-v2', from_pt=True)
