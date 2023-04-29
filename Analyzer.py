@@ -6,6 +6,7 @@ import numpy as np
 from kobert_tokenizer import KoBERTTokenizer
 import re
 from quickspacer import Spacer
+from symspellpy_ko import KoSymSpell, Verbosity
 
 device_kind = ""
 
@@ -95,7 +96,6 @@ def predict(sentence):
         out = model(token_ids, valid_length, segment_ids)
         for logits in out:
             logits = logits.detach().cpu().numpy()
-            # print(logits)
             print("Max : ", domain[np.argmax(logits)])
 
 
@@ -104,33 +104,32 @@ def predict(sentence):
 
 model = torch.load('./SentimentAnalysisKOBert.pt', map_location=torch.device(device_kind))
 
-def remove_unnecessary_word(text):
-    # text = re.sub('[/[\{\}\[\]\/|\)*~`\-_+<>@\#$%&\\\=\(\'\"]+', '', str(text))
-    # text = re.sub('[a-zA-Z]' , ' ', str(text))
-    # text = re.sub(' +', ' ', str(text))
-    # text = re.sub(r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", ' ', str(text)) # http로 시작되는 url
-    # text = re.sub(r"[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{2,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)", ' ', str(text)) # http로 시작되지 않는 url
+def preprocessing(text):
+    sym_spell = KoSymSpell()
+    sym_spell.load_korean_dictionary(decompose_korean=True, load_bigrams=True)
     text = re.sub('[^가-힣ㄱ-ㅎㅏ-ㅣ\\s]', '', text)
     
-    spacer = Spacer(level=3)
-    # text = text.rstrip().lstrip()
-    text.replace(" " , "")
-    text = spacer.space([text])
-    return text[0]
+    processedText = ""
+    words = text.split()
 
+    for word in words:
+        result = sym_spell.lookup(word, Verbosity.ALL)
+        if len(result) > 0:
+            processedText += result[0].term + " "
+        else:
+            processedText += word + " "
+    
+    spacer = Spacer(level=3)
+    text = text.rstrip().lstrip()
+    text = processedText.replace("\n", " ").replace(" ", "")
+    text = spacer.space([processedText])
+    
+    return text[0]
 
 def analyze_word(row):
     try:
-        result = predict(remove_unnecessary_word(row))
+        result = predict(preprocessing(row))
     except:
         print("Get some err")
         return
     return result
-
-
-# Happy '기쁨' = 0                    
-# Fear '불안' = 1                   
-# Embarrassed '당황' = 2                    
-# Sad '슬픔' = 3                    
-# Rage '분노' = 4                    
-# Hurt '상처' = 5  
