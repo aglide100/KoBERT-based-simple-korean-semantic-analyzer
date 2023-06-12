@@ -18,7 +18,7 @@ RUN pip install quickspacer tensorflow_io==0.29.0 konlpy
 RUN pip3 install -r requirements.txt
 RUN pip3 install 'git+https://github.com/SKTBrain/KoBERT.git#egg=kobert_tokenizer&subdirectory=kobert_hf'
 
-FROM mxnet/python:1.9.1_aarch64_cpu_py3 AS runner
+FROM python:3.7.0 AS runner
 
 ENV JAVA_HOME /usr/lib/jvm/java-1.7-openjdk/jre
 

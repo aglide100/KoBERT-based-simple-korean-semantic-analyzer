@@ -1,4 +1,4 @@
-from python:3.7 AS builder
+FROM mxnet/python:1.9.1_gpu_cu101_py3 AS builder
 
 WORKDIR /app
 
@@ -24,13 +24,13 @@ RUN pip install quickspacer tensorflow_io==0.29.0
 RUN pip3 install 'git+https://github.com/SKTBrain/KoBERT.git#egg=kobert_tokenizer&subdirectory=kobert_hf'
 
 
-FROM python:3:7 AS runner
+FROM mxnet/python:1.9.1_gpu_cu101_py3 AS runner
 
 COPY --from=builder /usr/local/lib/python3.7/ /usr/local/lib/python3.7/
 COPY --from=builder /app /app
 
 WORKDIR /app
-
+COPY . .
 
 RUN touch Test.py && cat Analyzer.py >> Test.py && cat TestCode.py >> Test.py && rm -f TestCode.py
 
