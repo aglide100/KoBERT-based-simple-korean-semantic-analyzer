@@ -1,4 +1,4 @@
-from mxnet/python:1.9.1_aarch64_cpu_py3
+FROM mxnet/python:1.9.1_aarch64_cpu_py3 AS builder
 
 WORKDIR /app
 ENV JAVA_HOME /usr/lib/jvm/java-1.7-openjdk/jre
@@ -14,13 +14,20 @@ RUN mkdir -p skt/kobert-base-v1 && cd skt/kobert-base-v1 && \
 
 COPY requirements.txt .
 
+RUN pip install quickspacer tensorflow_io==0.29.0 konlpy
 RUN pip3 install -r requirements.txt
-
 RUN pip3 install 'git+https://github.com/SKTBrain/KoBERT.git#egg=kobert_tokenizer&subdirectory=kobert_hf'
 
-RUN pip install quickspacer tensorflow_io==0.29.0 konlpy
+FROM mxnet/python:1.9.1_aarch64_cpu_py3 AS runner
 
-# RUN curl -s https://raw.githubusercontent.com/konlpy/konlpy/master/scripts/mecab.sh | bash -s
+ENV JAVA_HOME /usr/lib/jvm/java-1.7-openjdk/jre
+
+WORKDIR /app
+
+COPY --from=builder /usr/local/lib/python3.7/ /usr/local/lib/python3.7/
+COPY --from=builder /app /app
+
+WORKDIR /app
 COPY . .
 
 RUN touch Test.py && cat Analyzer.py >> Test.py && cat TestCode.py >> Test.py && rm -f TestCode.py
